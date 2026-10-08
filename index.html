@@ -1,0 +1,259 @@
+from pathlib import Path
+import zipfile, shutil, textwrap
+
+src = Path("/mnt/data/IMG_20250506_055105_148.webp")
+out_dir = Path("/mnt/data/sakshi_birthday_site")
+out_dir.mkdir(exist_ok=True)
+
+# Copy the uploaded photo with a simple web-friendly filename.
+photo_path = out_dir / "angad.jpg"
+from PIL import Image
+img = Image.open(src).convert("RGB")
+img.save(photo_path, "JPEG", quality=92)
+
+html = r'''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Happy Birthday Sakshi ❤️</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif}
+body{
+  background:radial-gradient(circle at 50% 20%,#fff0f7,#ffd2e4 45%,#ff8fbd 100%);
+  color:#fff;
+}
+.page{position:absolute;inset:0;display:none;overflow:hidden}
+.page.active{display:flex}
+
+/* PAGE 1 */
+#page1{align-items:center;justify-content:center;flex-direction:column}
+.gift-area{text-align:center;z-index:3}
+.gift-title{
+  font-size:clamp(28px,8vw,55px);
+  text-shadow:0 4px 14px #b0004b;
+  margin-bottom:28px;
+  animation:pulse 1.8s infinite;
+}
+.gift{
+  width:210px;height:170px;position:relative;margin:auto;cursor:pointer;
+  filter:drop-shadow(0 18px 20px #9b164f66);
+}
+.box{
+  position:absolute;left:15px;right:15px;bottom:0;height:125px;
+  background:linear-gradient(135deg,#ff4f9a,#c80059);
+  border-radius:8px 8px 18px 18px;border:4px solid #fff4;
+}
+.box:before{
+  content:"";position:absolute;left:50%;top:0;bottom:0;width:34px;
+  transform:translateX(-50%);background:#ffd447;
+}
+.lid{
+  position:absolute;left:0;right:0;top:27px;height:48px;
+  background:linear-gradient(135deg,#ff70ad,#d0005d);
+  border:4px solid #fff5;border-radius:10px;z-index:3;
+  transform-origin:12% 90%;
+  transition:1s cubic-bezier(.2,.8,.2,1);
+}
+.lid:after{
+  content:"";position:absolute;left:50%;top:-8px;transform:translateX(-50%);
+  width:34px;height:64px;background:#ffd447;border-radius:5px;
+}
+.bow{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:4}
+.bow span{
+  display:block;position:absolute;width:62px;height:36px;border:8px solid #ffd447;
+  border-radius:50% 50% 10% 50%;
+}
+.bow .l{right:2px;transform:rotate(24deg)}
+.bow .r{left:2px;transform:scaleX(-1) rotate(24deg)}
+.gift.open .lid{transform:rotate(-28deg) translate(-20px,-65px)}
+.tap{margin-top:26px;font-size:18px;font-weight:bold;opacity:.9}
+#next1{
+  margin-top:22px;display:none;border:0;border-radius:30px;padding:14px 28px;
+  font-size:18px;font-weight:bold;background:#fff;color:#d10061;cursor:pointer;
+  box-shadow:0 8px 22px #8e174c55;
+}
+#next1.show{display:inline-block;animation:pop .6s}
+.heart-float{position:absolute;font-size:24px;animation:float 5s linear infinite;opacity:.75}
+
+/* PAGE 2 */
+#page2{background:linear-gradient(135deg,#ff3d88,#8e1d80 60%,#40175f);display:none}
+#page2.active{display:block}
+.poster{
+  position:absolute;z-index:5;left:50%;top:48%;transform:translate(-50%,-50%);
+  width:min(88vw,390px);padding:20px 16px 18px;
+  border-radius:28px;background:#ffffffee;color:#8d155e;
+  box-shadow:0 18px 50px #21001f88;border:3px solid #fff;
+  text-align:center;
+}
+.poster h1{font-size:clamp(29px,8vw,45px);line-height:1.05}
+.poster h2{font-size:19px;margin:7px 0 13px;color:#d00068}
+.photo{
+  width:170px;height:170px;border-radius:50%;object-fit:cover;
+  object-position:center top;border:7px solid #ffd1e5;
+  box-shadow:0 8px 25px #6b104b55;
+}
+.poster .from{font-size:16px;font-weight:bold;margin:12px 0 4px}
+.poster .love{font-size:18px;font-weight:bold}
+.next-btn{
+  margin-top:13px;padding:10px 22px;border:0;border-radius:24px;
+  background:#d40069;color:white;font-weight:bold;cursor:pointer;
+}
+
+/* continuous wishes */
+.stream{
+  position:absolute;inset:0;overflow:hidden;z-index:2;pointer-events:none;
+}
+.column{
+  position:absolute;bottom:-120%;width:30%;display:flex;flex-direction:column;
+  gap:18px;animation:rise linear infinite;
+}
+.column span{
+  display:block;padding:9px 11px;border-radius:18px;
+  background:#ffffff1f;border:1px solid #ffffff55;
+  backdrop-filter:blur(3px);font-weight:bold;font-size:15px;
+  text-align:center;text-shadow:0 2px 5px #410029;
+}
+.c1{left:2%;animation-duration:17s}
+.c2{left:35%;animation-duration:20s;animation-delay:-7s}
+.c3{right:2%;animation-duration:18s;animation-delay:-12s}
+.confetti{position:absolute;width:8px;height:16px;top:-20px;z-index:8;animation:fall 4s linear forwards}
+.balloon{position:absolute;width:42px;height:54px;border-radius:50% 50% 45% 45%;opacity:.75;z-index:1}
+.balloon:after{content:"";position:absolute;width:1px;height:100px;background:#fff8;left:50%;top:53px}
+.b1{left:6%;top:10%;animation:updown 3s infinite}
+.b2{right:8%;top:16%;animation:updown 4s infinite reverse}
+.spark{position:absolute;font-size:26px;animation:twinkle 1.5s infinite}
+
+@keyframes rise{from{transform:translateY(0)}to{transform:translateY(-230%)}}
+@keyframes fall{to{transform:translateY(115vh) rotate(720deg)}}
+@keyframes pulse{50%{transform:scale(1.04)}}
+@keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes float{from{transform:translateY(110vh) rotate(0)}to{transform:translateY(-20vh) rotate(360deg)}}
+@keyframes updown{50%{transform:translateY(15px)}}
+@keyframes twinkle{50%{transform:scale(1.4) rotate(15deg);opacity:.5}}
+
+@media(max-width:600px){
+  .column span{font-size:12px;padding:7px 8px}
+  .photo{width:145px;height:145px}
+  .poster{top:50%}
+}
+</style>
+</head>
+<body>
+
+<section id="page1" class="page active">
+  <div class="gift-area">
+    <div class="gift-title">🎁 A Special Gift For You 🎀</div>
+    <div class="gift" id="gift">
+      <div class="bow"><span class="l"></span><span class="r"></span></div>
+      <div class="lid"></div>
+      <div class="box"></div>
+    </div>
+    <div class="tap" id="tap">Tap the gift to open it 💝</div>
+    <button id="next1">Open Birthday Surprise 💖</button>
+  </div>
+</section>
+
+<section id="page2" class="page">
+  <div class="balloon b1">🎈</div>
+  <div class="balloon b2">🎈</div>
+  <div class="spark" style="left:10%;top:42%">✨</div>
+  <div class="spark" style="right:9%;top:62%">✨</div>
+
+  <div class="stream">
+    <div class="column c1">
+      <span>🎂 Happy Birthday Sakshi! ❤️</span><span>🥳 Hamesha smile karti rehna!</span>
+      <span>💖 Tumhari har wish puri ho</span><span>🌸 Life khushiyon se bhar jaye</span>
+      <span>✨ Stay blessed, stay happy!</span><span>🎁 Aaj ka din sirf tumhare naam</span>
+      <span>💕 Lots of happiness for you</span><span>🎉 Have an amazing birthday!</span>
+      <span>🌷 Hamesha aisi hi special rehna</span>
+    </div>
+    <div class="column c2">
+      <span>💗 Happy Birthday Sakshi 🎂</span><span>🌟 Tumhari smile priceless hai</span>
+      <span>🥰 Khush raho, mast raho</span><span>🎀 May your dreams come true</span>
+      <span>💐 Bahut saari khushiyan mile</span><span>🎊 Enjoy your special day!</span>
+      <span>❤️ Sending lots of love & wishes</span><span>🍰 Cake, smiles & memories!</span>
+      <span>✨ Keep shining, Sakshi!</span>
+    </div>
+    <div class="column c3">
+      <span>🎉 Birthday wishes for Sakshi!</span><span>💝 Aaj aur hamesha happy raho</span>
+      <span>🌹 Har pal beautiful ho</span><span>🥳 Party hard & smile more!</span>
+      <span>🎂 Make a wish!</span><span>💫 New year, new memories</span>
+      <span>💖 You deserve the best</span><span>🎁 Lots of love & blessings</span>
+      <span>🌈 Keep smiling forever!</span>
+    </div>
+  </div>
+
+  <div class="poster">
+    <div style="font-size:28px">🎂✨🎉</div>
+    <h1>HAPPY<br>BIRTHDAY<br>SAKSHI</h1>
+    <h2>💖 Stay Happy & Blessed 💖</h2>
+    <img class="photo" src="angad.jpg" alt="Angad">
+    <div class="from">Angad ki side se ❤️</div>
+    <div class="love">🎉 Happy Birthday Sakshi 🎉</div>
+    <button class="next-btn" onclick="burst()">More Wishes 💕</button>
+  </div>
+</section>
+
+<script>
+const gift=document.getElementById("gift");
+const next1=document.getElementById("next1");
+const tap=document.getElementById("tap");
+
+gift.addEventListener("click",()=>{
+  gift.classList.add("open");
+  tap.textContent="Gift opened! 🎁✨";
+  next1.classList.add("show");
+  confetti();
+  try{
+    const c=new (window.AudioContext||window.webkitAudioContext)();
+    const o=c.createOscillator(),g=c.createGain();
+    o.frequency.value=660; g.gain.value=.06; o.connect(g);g.connect(c.destination);
+    o.start();o.stop(c.currentTime+.18);
+  }catch(e){}
+});
+
+next1.addEventListener("click",()=>{
+  document.getElementById("page1").classList.remove("active");
+  document.getElementById("page2").classList.add("active");
+  burst(35);
+});
+
+function confetti(){
+  for(let i=0;i<70;i++){
+    const x=document.createElement("div");
+    x.className="confetti";
+    x.style.left=Math.random()*100+"vw";
+    x.style.animationDuration=(2.5+Math.random()*2.5)+"s";
+    x.style.animationDelay=(Math.random()*.8)+"s";
+    x.style.transform=`rotate(${Math.random()*360}deg)`;
+    x.style.background=["#fff","#ffd447","#ff4f9a","#8de8ff"][Math.floor(Math.random()*4)];
+    document.body.appendChild(x);
+    setTimeout(()=>x.remove(),6000);
+  }
+}
+function burst(n=25){
+  for(let i=0;i<n;i++){
+    const x=document.createElement("div");
+    x.className="confetti";
+    x.style.left=(30+Math.random()*40)+"vw";
+    x.style.animationDuration=(2+Math.random()*2)+"s";
+    x.style.background=["#fff","#ffd447","#ffb3d5","#b7f0ff"][Math.floor(Math.random()*4)];
+    document.getElementById("page2").appendChild(x);
+    setTimeout(()=>x.remove(),5000);
+  }
+}
+</script>
+</body>
+</html>'''
+
+(out_dir / "index.html").write_text(html, encoding="utf-8")
+
+zip_path = Path("/mnt/data/Sakshi_Happy_Birthday_Website.zip")
+with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
+    z.write(out_dir / "index.html", "index.html")
+    z.write(out_dir / "angad.jpg", "angad.jpg")
+
+print(f"Ready files created:\n{zip_path}\n{out_dir/'index.html'}\n{photo_path}")
+  
